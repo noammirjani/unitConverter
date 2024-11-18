@@ -1,0 +1,10 @@
+# Ignore the .NET build output directories
+bin/
+obj/
+
+
+# Ignore user-specific files created by Visual Studio
+.vs/
+.vscode/
+.idea/
+
