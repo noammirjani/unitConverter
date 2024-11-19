@@ -6,6 +6,7 @@ class Program
     {
         while(true){
             try{
+                Console.WriteLine("\nEnter the type of conversion you would like to preform or type 'exit' to quit. \n Options: length, temperature, weight");
                 string type_conversion = Console.ReadLine() ?? "";
                 
                 if(type_conversion.Equals("exit")){
@@ -13,8 +14,9 @@ class Program
                 }
 
                 UnitConversionBase converter = TypeFactory.Instance.createType(type_conversion);
+
                 converter.ReadUnitsFromInput();
-                converter.preform_conversion();
+                converter.convert();
             }
             catch (Exception e){
                 Console.WriteLine(e.Message);

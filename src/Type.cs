@@ -1,6 +1,3 @@
-
-using System.Data.Common;
-
 public abstract class UnitConversionBase
 {
     protected readonly string PossibleUnit1;
@@ -18,21 +15,26 @@ public abstract class UnitConversionBase
         PossibleUnit2 = possibleUnit2;
     }
 
-    public void convert(string type1, string type2)
-    {
-        CurrentUnit = type1;
-        TargetUnit = type2;
-        ValidateUnits();
-        preform_conversion();
-    }
-    public abstract void preform_conversion();
+    public abstract float preform_conversion(float amount);
     
+    public void convert()
+    {
+        float amount = ReadAmount();
+        float result = preform_conversion(amount);
+        PrintResult(result);
+    }
+
+    public void PrintResult(float result)
+    {
+        Console.WriteLine($"The result is: {result}{TargetUnit} \n");
+    }
+
     public void ReadUnitsFromInput()
     {
-        Console.Write("Enter the current unit: ");
+        Console.Write($"Enter the current unit: ({PossibleUnit1} or {PossibleUnit2}) ");
         CurrentUnit = Console.ReadLine()?.Trim().ToLower() ?? string.Empty;
 
-        Console.Write("Enter the target unit: ");
+        Console.Write($"Enter the current unit: ({PossibleUnit1} or {PossibleUnit2}) ");
         TargetUnit = Console.ReadLine()?.Trim().ToLower()  ?? string.Empty;
 
         ValidateUnits();
@@ -40,6 +42,9 @@ public abstract class UnitConversionBase
 
     protected void ValidateUnits()
     {
+        CurrentUnit = CurrentUnit.ToLower().Trim(); 
+        TargetUnit = TargetUnit.ToLower().Trim();
+
         //can not be empty
         if (string.IsNullOrWhiteSpace(CurrentUnit) || string.IsNullOrWhiteSpace(TargetUnit))
         {
@@ -63,61 +68,67 @@ public abstract class UnitConversionBase
     {
         return unit.Equals(PossibleUnit1) || unit.Equals(PossibleUnit2);
     }
+
+    protected float ReadAmount()
+    {
+        Console.Write("Enter the amount to convert: ");
+        string amount = Console.ReadLine()?.Trim() ?? "0";
+        if (!float.TryParse(amount, out float result))
+        {
+            throw new InvalidDataException("Amount must be a number.");
+        }
+        return result;
+    }
 }
 
 class Length : UnitConversionBase
 {
-    public Length() : base("m", "cm") {}
+    public Length() : base("m", "ft") {} // meters and feet
 
-    public override void preform_conversion()
-    {
-        Console.WriteLine("Performing length conversion...");
-        
-        if (CurrentUnit.Equals("m") && TargetUnit.Equals("cm"))
+    public override float preform_conversion(float amount)
+    {   
+        if (CurrentUnit.Equals("m") && TargetUnit.Equals("ft"))
         {
-            Console.WriteLine("m to cm");
+            return amount * 3.28084f;
         }
         else
         {
-            Console.WriteLine("cm to m");
+            return amount / 3.28084f;
         }
     }
+
 }
 
 class Temperature : UnitConversionBase
  {
     public Temperature() : base("c", "f") {}
 
-    public override void preform_conversion()
-    {
-        Console.WriteLine("Performing temperature conversion...");
-        
+    public override float preform_conversion(float amount)
+    {        
         if (CurrentUnit.Equals("c") && TargetUnit.Equals("f"))
         {
-            Console.WriteLine("c to f");
+            return amount * 9 / 5 + 32;
         }
         else
         {
-            Console.WriteLine("f to c");
+            return (amount - 32) * 5 / 9;
         }
     }
 }
 
 class Weight : UnitConversionBase
 {
-    public Weight() : base("kg", "g") {}
+    public Weight() : base("kg", "lb") {} // kilograms and pounds
 
-    public override void preform_conversion()
+    public override float preform_conversion(float amount)
     {
-        Console.WriteLine("Performing weight conversion...");
-        
-        if (CurrentUnit.Equals("kg") && TargetUnit.Equals("g"))
+        if (CurrentUnit.Equals("kg") && TargetUnit.Equals("lb"))
         {
-            Console.WriteLine("kg to g");
+            return amount * 2.20462f;
         }
         else
         {
-            Console.WriteLine("g to kg");
+            return amount / 2.20462f;
         }
     }
 }
