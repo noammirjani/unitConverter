@@ -1,27 +1,32 @@
 ﻿
-
 class Program
 {
     static void Main(string[] args)
     {
         while(true){
             try{
-                Console.WriteLine("\nEnter the type of conversion you would like to preform or type 'exit' to quit. \n Options: length, temperature, weight");
-                string type_conversion = Console.ReadLine() ?? "";
+                Console.WriteLine("\nEnter the type of conversion you would like to perform or type 'exit' to quit.\nOptions: length, temperature, weight.");
+                string typeConversion = Console.ReadLine()?.Trim().ToLower() ?? string.Empty;
                 
-                if(type_conversion.Equals("exit")){
-                    break;
+                if(typeConversion == "exit"){
+                    throw new ExitException();
                 }
 
-                UnitConversionBase converter = TypeFactory.Instance.createType(type_conversion);
-
+                var converter = TypeFactory.Instance.createType(typeConversion);
                 converter.ReadUnitsFromInput();
-                converter.convert();
+                converter.ConvertAndPrintResult();
             }
-            catch (Exception e){
+            catch (ExitException){
+                break;
+            }
+            catch (TypeConversionWasNotFound e ){
                 Console.WriteLine(e.Message);
             }
-            finally{
+            catch (UnitInvalid e){
+                Console.WriteLine(e.Message);
+            }
+            catch (InvalidDataException e){
+                Console.WriteLine($"Invalid input: {e.Message}");
             }
         }
     }
