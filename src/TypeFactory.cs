@@ -1,24 +1,15 @@
 
 class TypeFactory{
-    private static TypeFactory? _instance = null;
     private Dictionary<string, Func<UnitConversionBase>> _types = new Dictionary<string, Func<UnitConversionBase>>();
+
+    // Singleton - thread safe
+    private static readonly Lazy<TypeFactory> _instance = new Lazy<TypeFactory>(() => new TypeFactory());
+    public static TypeFactory Instance => _instance.Value;
 
     private TypeFactory(){
         _types.Add("length", () => new Length());
         _types.Add("temperature", () => new Temperature());
         _types.Add("weight", () => new Weight());
-    }
-
-    public static TypeFactory Instance
-    {
-        get
-        {
-            if (_instance == null)
-            {
-                _instance = new TypeFactory();
-            }
-            return _instance;
-        }
     }
 
     public UnitConversionBase createType(string type){
