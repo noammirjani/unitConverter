@@ -15,36 +15,19 @@ public abstract class UnitConversionBase
         PossibleUnit2 = possibleUnit2;
     }
 
-    public abstract float preform_conversion(float amount);
+    public abstract float PerformConversion(float amount);
     
-    public void convert()
+    public void ConvertAndPrintResult()
     {
         float amount = ReadAmount();
-        float result = preform_conversion(amount);
-        PrintResult(result);
+        float result = PerformConversion(amount);
+        DisplayResult(result);
     }
 
-    public void PrintResult(float result)
-    {
-        Console.WriteLine($"The result is: {result}{TargetUnit} \n");
-    }
-
-    public void ReadUnitsFromInput()
-    {
-        Console.Write($"Enter the current unit: ({PossibleUnit1} or {PossibleUnit2}) ");
-        CurrentUnit = Console.ReadLine()?.Trim().ToLower() ?? string.Empty;
-
-        Console.Write($"Enter the current unit: ({PossibleUnit1} or {PossibleUnit2}) ");
-        TargetUnit = Console.ReadLine()?.Trim().ToLower()  ?? string.Empty;
-
-        ValidateUnits();
-    }
+    public void DisplayResult(float result) => Console.WriteLine($"The result is: {result}{TargetUnit} \n");
 
     protected void ValidateUnits()
     {
-        CurrentUnit = CurrentUnit.ToLower().Trim(); 
-        TargetUnit = TargetUnit.ToLower().Trim();
-
         //can not be empty
         if (string.IsNullOrWhiteSpace(CurrentUnit) || string.IsNullOrWhiteSpace(TargetUnit))
         {
@@ -60,75 +43,48 @@ public abstract class UnitConversionBase
         // units must be in the list of possible units
         if (!IsValidUnit(CurrentUnit) || !IsValidUnit(TargetUnit))
         {
-            throw new UnitInvalid($"Invalid unit(s): {CurrentUnit} or {TargetUnit}. Valid units: {PossibleUnit1}, {PossibleUnit2}.");
+            throw new UnitInvalid($"Invalid unit(s): {UnitErrorMessage}");
         }
+
     }
+    
+    protected abstract string UnitErrorMessage { get; }
 
     private bool IsValidUnit(string unit)
     {
-        return unit.Equals(PossibleUnit1) || unit.Equals(PossibleUnit2);
+        return unit.Equals(PossibleUnit1, StringComparison.OrdinalIgnoreCase) || 
+            unit.Equals(PossibleUnit2, StringComparison.OrdinalIgnoreCase);
     }
 
     protected float ReadAmount()
     {
         Console.Write("Enter the amount to convert: ");
-        string amount = Console.ReadLine()?.Trim() ?? "0";
+        string amount = Read();
         if (!float.TryParse(amount, out float result))
         {
             throw new InvalidDataException("Amount must be a number.");
         }
         return result;
     }
-}
-
-class Length : UnitConversionBase
-{
-    public Length() : base("m", "ft") {} // meters and feet
-
-    public override float preform_conversion(float amount)
-    {   
-        if (CurrentUnit.Equals("m") && TargetUnit.Equals("ft"))
-        {
-            return amount * 3.28084f;
-        }
-        else
-        {
-            return amount / 3.28084f;
-        }
-    }
-
-}
-
-class Temperature : UnitConversionBase
- {
-    public Temperature() : base("c", "f") {}
-
-    public override float preform_conversion(float amount)
-    {        
-        if (CurrentUnit.Equals("c") && TargetUnit.Equals("f"))
-        {
-            return amount * 9 / 5 + 32;
-        }
-        else
-        {
-            return (amount - 32) * 5 / 9;
-        }
-    }
-}
-
-class Weight : UnitConversionBase
-{
-    public Weight() : base("kg", "lb") {} // kilograms and pounds
-
-    public override float preform_conversion(float amount)
+   
+    public void ReadUnitsFromInput()
     {
-        if (CurrentUnit.Equals("kg") && TargetUnit.Equals("lb"))
+        Console.Write($"Enter the current unit: ({PossibleUnit1} or {PossibleUnit2}) ");
+        CurrentUnit = Read();   
+
+        Console.Write($"Enter the target unit: ({PossibleUnit1} or {PossibleUnit2}) ");
+        TargetUnit = Read();
+
+        ValidateUnits();
+    }
+
+    private string Read()
+    {
+        string input = Console.ReadLine()?.Trim().ToLower() ?? string.Empty;
+        if (input.Equals("exit"))
         {
-            return amount * 2.20462f;
+            throw new ExitException();
         }
-        else
-        {
-            return amount / 2.20462f;
-        }
+        return input;
     }
 }

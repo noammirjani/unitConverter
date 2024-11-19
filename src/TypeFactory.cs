@@ -7,9 +7,9 @@ class TypeFactory{
     public static TypeFactory Instance => _instance.Value;
 
     private TypeFactory(){
-        _types.Add("length", () => new Length());
-        _types.Add("temperature", () => new Temperature());
-        _types.Add("weight", () => new Weight());
+        _types.Add("length", () => new LengthConversion());
+        _types.Add("temperature", () => new TemperatureConversion());
+        _types.Add("weight", () => new WeightConversion());
     }
 
     public UnitConversionBase createType(string type){
