@@ -1,83 +1,94 @@
+public struct Unit
+{
+    public Unit(string name, string shortName, Func<float, float> conversionFromBase, Func<float, float> conversionToBase)
+    {
+        Name = name;
+        ShortName = shortName;
+        ConversionFromBase = conversionFromBase;
+        ConversionToBase = conversionToBase;
+    }
+    public string Name { get; set; }
+    public string ShortName { get; set; }
+    public Func<float, float> ConversionFromBase { get; set; }
+    public Func<float, float> ConversionToBase { get; set; }
+}
+
+
+
 public abstract class UnitConversionBase
 {
-    protected readonly string PossibleUnit1;
-    protected readonly string PossibleUnit2;
+    protected readonly Dictionary<string, Unit> Units;
     protected string CurrentUnit { get; private set; } = string.Empty;
     protected string TargetUnit { get; private set; } = string.Empty;
+    protected readonly string ValidUnitsStr;
 
-    protected UnitConversionBase(string possibleUnit1, string possibleUnit2)
+    protected UnitConversionBase(Dictionary<string, Unit> conversionRates)
     {
-        if (string.IsNullOrWhiteSpace(possibleUnit1) || string.IsNullOrWhiteSpace(possibleUnit2))
-        {
-            throw new ArgumentException("Possible units cannot be null or empty.");
-        }
-        PossibleUnit1 = possibleUnit1;
-        PossibleUnit2 = possibleUnit2;
+        Units = conversionRates ?? throw new ArgumentNullException(nameof(conversionRates));
+        ValidUnitsStr = string.Join(", ", Units.Keys);
     }
 
-    public abstract float PerformConversion(float amount);
-    
-    public void ConvertAndPrintResult()
+    public void Run()
     {
+        ReadUnitsFromInput();
         float amount = ReadAmount();
         float result = PerformConversion(amount);
-        DisplayResult(result);
+        Console.WriteLine($"The result is: {result} {TargetUnit}");
     }
-
-    public void DisplayResult(float result) => Console.WriteLine($"The result is: {result}{TargetUnit} \n");
-
-    protected void ValidateUnits()
+    
+    public float PerformConversion(float amount)
+    {
+        if (!Units.ContainsKey(CurrentUnit) || !Units.ContainsKey(TargetUnit))
+            throw new UnitInvalid("Invalid units provided.");
+        
+        return Units[TargetUnit].ConversionFromBase(Units[CurrentUnit].ConversionToBase(amount));
+    }
+   
+   protected void ValidateUnits()
     {
         //can not be empty
         if (string.IsNullOrWhiteSpace(CurrentUnit) || string.IsNullOrWhiteSpace(TargetUnit))
-        {
             throw new UnitInvalid();
-        }
-
+        
         // units can not be the same
         if (CurrentUnit.Equals(TargetUnit))
-        {
             throw new UnitInvalid("Current and target units must be different.");
-        }
 
         // units must be in the list of possible units
-        if (!IsValidUnit(CurrentUnit) || !IsValidUnit(TargetUnit))
-        {
-            throw new UnitInvalid($"Invalid unit(s): {UnitErrorMessage}");
-        }
+        if (!Units.ContainsKey(CurrentUnit) || !Units.ContainsKey(TargetUnit))
+            throw new UnitInvalid($"Invalid unit(s): {CurrentUnit} and/or {TargetUnit}. The possible units are: {ValidUnitsStr}");
 
     }
-    
-    protected abstract string UnitErrorMessage { get; }
-
-    private bool IsValidUnit(string unit)
-    {
-        return unit.Equals(PossibleUnit1, StringComparison.OrdinalIgnoreCase) || 
-            unit.Equals(PossibleUnit2, StringComparison.OrdinalIgnoreCase);
-    }
-
-    protected float ReadAmount()
+   
+    private float ReadAmount()
     {
         Console.Write("Enter the amount to convert: ");
         string amount = Read();
+
         if (!float.TryParse(amount, out float result))
         {
             throw new InvalidDataException("Amount must be a number.");
         }
+
+        if (result <= 0)
+        {
+            throw new InvalidDataException("Amount must be a positive number.");
+        }
+
         return result;
     }
    
     public void ReadUnitsFromInput()
     {
-        Console.Write($"Enter the current unit: ({PossibleUnit1} or {PossibleUnit2}) ");
+        Console.Write($"Enter the current unit ({ValidUnitsStr}):");
         CurrentUnit = Read();   
 
-        Console.Write($"Enter the target unit: ({PossibleUnit1} or {PossibleUnit2}) ");
+        Console.Write($"Enter the target unit ({ValidUnitsStr}):");
         TargetUnit = Read();
 
         ValidateUnits();
     }
-
+    
     private string Read()
     {
         string input = Console.ReadLine()?.Trim().ToLower() ?? string.Empty;

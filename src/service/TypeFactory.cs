@@ -14,7 +14,7 @@ class TypeFactory{
 
     public UnitConversionBase createType(string type){
     
-        type = type.Trim().ToLower();
+        type = type.Trim();
 
         if(!_types.ContainsKey(type)){
             throw new TypeConversionWasNotFound(type);

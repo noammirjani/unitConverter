@@ -12,9 +12,7 @@ class Program
                     throw new ExitException();
                 }
 
-                var converter = TypeFactory.Instance.createType(typeConversion);
-                converter.ReadUnitsFromInput();
-                converter.ConvertAndPrintResult();
+                TypeFactory.Instance.createType(typeConversion).Run();
             }
             catch (ExitException){
                 break;

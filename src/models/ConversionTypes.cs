@@ -1,60 +1,54 @@
 
 public class LengthConversion : UnitConversionBase
 {
-    public LengthConversion() : base("m", "ft") { }
-
-    protected override string UnitErrorMessage => "For length, please choose between 'm' (meters) or 'ft' (feet)";
-
-    public override float PerformConversion(float amount)
-    {
-        if (CurrentUnit.Equals("m", StringComparison.OrdinalIgnoreCase) && 
-            TargetUnit.Equals("ft", StringComparison.OrdinalIgnoreCase))
+    public LengthConversion() : base(
+        new Dictionary<string, Unit>
         {
-            return amount * 3.28084f;
-        }
-        else
-        {
-            return amount / 3.28084f;
-        }
-    }
+            { "m", new Unit("meter", "m", x => x, x => x)},
+            { "ft", new Unit("feet", "ft", x => x * 3.28084f, x => x / 3.28084f)},
+            { "in", new Unit("inch", "in", x => x * 39.3701f, x => x / 39.3701f)},
+            { "yd", new Unit("yard", "yd", x => x * 1.09361f, x => x / 1.09361f)},
+            { "mi", new Unit("mile", "mi", x => x * 0.000621371f, x => x / 0.000621371f)},
+            { "km", new Unit("kilometer", "km", x => x * 0.001f, x => x / 0.001f)},
+            { "cm", new Unit("centimeter", "cm", x => x * 100f, x => x / 100f)},
+            { "mm", new Unit("millimeter", "mm", x => x * 1000f, x => x / 1000f)},
+            { "um", new Unit("micrometer", "um", x => x * 1000000f, x => x / 1000000f)},
+            { "nm", new Unit("nanometer", "nm", x => x * 1000000000f, x => x / 1000000000f)},
+        })
+    { }
 }
 
 
 public class TemperatureConversion : UnitConversionBase
 {
-    public TemperatureConversion() : base("c", "f") { }
-
-    protected override string UnitErrorMessage => "For temperature, please choose between 'c' (Celsius) or 'f' (Fahrenheit)";
-
-    public override float PerformConversion(float amount)
+    public TemperatureConversion() : base(new Dictionary<string, Unit>
     {
-        if (CurrentUnit.Equals("c", StringComparison.OrdinalIgnoreCase) && TargetUnit.Equals("f", StringComparison.OrdinalIgnoreCase))
-        {
-            return amount * 9 / 5 + 32;
-        }
-        else
-        {
-            return (amount - 32) * 5 / 9;
-        }
-    }
+        { "c", new Unit("Celsius", "C", x => x, x => x)},
+        { "f", new Unit("Fahrenheit", "F", x => x * 9 / 5 + 32, x => (x - 32) * 5 / 9)},
+        { "k", new Unit("Kelvin", "K", x => x + 273.15f, x => x - 273.15f)},
+        { "r", new Unit("Rankine", "R", x => x * 9 / 5 + 491.67f, x => (x - 491.67f) * 5 / 9)},
+        { "re", new Unit("Reaumur", "Re", x => x * 4 / 5, x => x * 5 / 4)},
+    }) { }
 }
 
 
 public class WeightConversion : UnitConversionBase
 {
-    public WeightConversion() : base("kg", "lb") { }
-
-    protected override string UnitErrorMessage => "For weight, please choose between 'kg' (kilograms) or 'lb' (pounds)";
-
-    public override float PerformConversion(float amount)
+    public WeightConversion() : base(new Dictionary<string, Unit>
     {
-        if (CurrentUnit.Equals("kg", StringComparison.OrdinalIgnoreCase) && TargetUnit.Equals("lb", StringComparison.OrdinalIgnoreCase))
-        {
-            return amount * 2.20462f;
-        }
-        else
-        {
-            return amount / 2.20462f;
-        }
-    }
+        { "g", new Unit("gram", "g", x => x, x => x)},
+        { "mg", new Unit("milligram", "mg", x => x * 0.001f, x => x / 0.001f)},
+        { "cg", new Unit("centigram", "cg", x => x * 0.01f, x => x / 0.01f)},
+        { "dg", new Unit("decigram", "dg", x => x * 0.1f, x => x / 0.1f)},
+        { "dag", new Unit("decagram", "dag", x => x * 10f, x => x / 10f)},
+        { "hg", new Unit("hectogram", "hg", x => x * 100f, x => x / 100f)},
+        { "kg", new Unit("kilogram", "kg", x => x * 1000f, x => x / 1000f)},
+        { "Mt", new Unit("metric ton", "Mt", x => x * 1000000f, x => x / 1000000f)},
+        { "lb", new Unit("pound", "lb", x => x * 453.59237f, x => x / 453.59237f)},
+        { "oz", new Unit("ounce", "oz", x => x * 28.3495f, x => x / 28.3495f)},
+        { "st", new Unit("stone", "st", x => x * 6350.29497f, x => x / 6350.29497f)},
+        { "ct", new Unit("carat", "ct", x => x * 0.2f, x => x / 0.2f)},
+        { "gr", new Unit("grain", "gr", x => x * 0.0648f, x => x / 0.0648f)},
+        { "t", new Unit("ton", "t", x => x * 0.00110231f, x => x / 0.00110231f)},
+    }) { }
 }
